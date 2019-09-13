@@ -183,8 +183,11 @@ function playerReset(){
 
 	if (collide(arena, player)){
 		arena.forEach(row => row.fill(0));
+		// Reset scores and rows on collision
 		player.score = 0;
 		updateScore();
+		player.rows = 0;
+		updateRows();
 	}
 }
 
@@ -233,6 +236,7 @@ function playerDrop(){
 		playerReset();
 		cleanArena();
 		updateScore();
+		updateRows();
 	}
 	dropCounter = 0;
 }
@@ -260,7 +264,7 @@ function updateScore(){
 }
 
 function updateRows(){
-	getId('rows').innerText = 'Rows: ' + player.rows
+	getId('rows').innerText = 'Rows: ' + player.rows;
 }
 
 const arena = createMatrix(12, 20);

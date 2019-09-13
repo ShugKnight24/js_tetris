@@ -23,7 +23,11 @@ First version of the classic Tetris game rebuilt using JavaScript and HTML5 canv
 - [ ] Add a more 'complex' version with additional pieces
 
 ### Bugs
-- [ ] Rows section is not currently updating
+
+### Resolved Bugs
+- [X] ~~Rows counter is not updating~~
+  - Rows counter is now updating properly
+  - It's important to call the function... -_-
 
 #### Suggestions
 Feel free to reach out, create an issue, or make a pull request for any features and improvements you'd like to see in the game.
