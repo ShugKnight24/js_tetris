@@ -25,10 +25,9 @@ const previewContext = getId('preview').getContext('2d');
 previewContext.scale(20, 20);
 
 function cleanArena(){
-	let rowCount = 1;
+	let rowCount = 0;
 	outer: for (let y = arena.length - 1; y > 0; --y){
 		for (let x = 0; x < arena[y].length; ++x){
-			// TODO: Create a gameover screen
 			if (arena[y][x] === 0){
 				continue outer;
 			}
@@ -38,12 +37,16 @@ function cleanArena(){
 		arena.unshift(row);
 		++y;
 
+		rowCount++;
+	}
+
+	if (rowCount > 0) {
+		player.score += rowCount * rowCount * 10; // Increase score more when more rows cleared
 		player.rows += rowCount;
-		player.score += rowCount * 10;
-// TODO: Create a row multiplier for getting many rows out
-// TODO: implement better scoring system
+		rowCount = 0;
 	}
 }
+
 
 function createMatrix(w, h){
 	const matrix = [];
