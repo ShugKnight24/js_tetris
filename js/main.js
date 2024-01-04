@@ -8,7 +8,6 @@ const player = {
 	matrix: null,
 	rows: 0,
 	score: 0,
-	nextPiece: null,
 	isPaused: false,
 	gameOver: false
 };
@@ -192,17 +191,19 @@ function playerMove(dir){
 	}
 }
 
-// TODO: Implement a queue system otherwise the next piece wont match
 function getRandomPiece() {
 	const pieces = 'IJLOSTZ';
 	return createPiece(pieces[pieces.length * Math.random() | 0]);
 }
 
+const pieceQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+
 function playerReset(){
-	player.matrix = player.nextPiece || getRandomPiece();
-	player.nextPiece = getRandomPiece();
+	player.matrix = pieceQueue.shift();
 	player.pos.y = 0;
 	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+
+	pieceQueue.push(getRandomPiece());
 
 	if (isColliding(arena, player)){
 		player.isPaused = true;
@@ -235,17 +236,14 @@ function drawNextPiece() {
 	clearCanvas(previewContext, getId('preview'));
 
 	const scale = 20;
-	const x = getId('preview').width / 2 / scale - player.nextPiece[0].length / 2;
-	const y = getId('preview').height / 2 / scale - player.nextPiece.length / 2;
+	const x = getId('preview').width / 2 / scale - pieceQueue[0].length / 2;
+	const y = getId('preview').height / 2 / scale - pieceQueue[0].length / 2;
 
-	drawMatrix(player.nextPiece, { x, y }, previewContext, undefined, false);
+	drawMatrix(pieceQueue[0], { x, y }, previewContext, undefined, false);
 }
 
 function updatePieces() {
-	player.matrix = player.nextPiece || getRandomPiece();
-	player.nextPiece = getRandomPiece();
-	player.pos.y = 0;
-	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+	pieceQueue.push(getRandomPiece());
 }
 
 function swap(matrix, x, y) {
