@@ -20,6 +20,21 @@ body {
 	font-size: 0;
 }
 
+.screen {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: rgba(0, 0, 0, 0.90);
+	color: white;
+	font-size: 2rem;
+}
+
 #counters,
 #directions,
 #game-container {
@@ -37,20 +52,30 @@ body {
 }
 
 #start {
-	margin-top: 20px;
+	margin: 20px 0 45px;
 }
 
-#start-game-button {
+#continue-game-button,
+#restart-game-button,
+#start-game-button,
+#pause-button {
 	padding: 10px;
 	border: 2px solid #FFF;
 	border-radius: 4px;
 }
 
-#start-game-button:hover {
+#continue-game-button:hover,
+#restart-game-button:hover,
+#start-game-button:hover,
+#pause-button:hover {
 	cursor: pointer;
 	color: #000;
 	background-color: #FFF;
 	border-color: #000;
+}
+
+#restart-game-button {
+	margin-top: 20px;
 }
 
 #game-container {
@@ -60,6 +85,10 @@ body {
 canvas {
 	border: solid .2rem #FFF;
 	height: 50vh;
+}
+
+#preview {
+	height: 25vh;
 }
 
 #directions h1 {

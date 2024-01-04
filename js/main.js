@@ -1,19 +1,33 @@
 'use strict';
 
+const player = {
+	pos: {
+		x: 5,
+		y: 5
+	},
+	matrix: null,
+	rows: 0,
+	score: 0,
+	nextPiece: null,
+	isPaused: false,
+	gameOver: false
+};
+
 function getId(element){
 	return document.getElementById(element);
 }
 
 const canvas = getId('tetris-field');
 const context = canvas.getContext('2d');
-
 context.scale(20, 20);
 
+const previewContext = getId('preview').getContext('2d');
+previewContext.scale(20, 20);
+
 function cleanArena(){
-	let rowCount = 1;
+	let rowCount = 0;
 	outer: for (let y = arena.length - 1; y > 0; --y){
 		for (let x = 0; x < arena[y].length; ++x){
-			// TODO: Create a gameover screen
 			if (arena[y][x] === 0){
 				continue outer;
 			}
@@ -23,26 +37,16 @@ function cleanArena(){
 		arena.unshift(row);
 		++y;
 
+		rowCount++;
+	}
+
+	if (rowCount > 0) {
+		player.score += rowCount * rowCount * 10; // Increase score more when more rows cleared
 		player.rows += rowCount;
-		player.score += rowCount * 10;
-// TODO: Create a row multiplier for getting many rows out
-// TODO: implement better scoring system
+		rowCount = 0;
 	}
 }
 
-function collide(arena, player){
-	const [m, o] = [player.matrix, player.pos];
-	for (let y = 0; y < m.length; ++y){
-		for (let x = 0; x < m[y].length; ++x){
-			if (m[y][x] !== 0 &&
-				(arena[y + o.y] &&
-				arena[y + o.y][x + o.x]) !== 0){
-				return true;
-			}
-		}
-	}
-	return false;
-}
 
 function createMatrix(w, h){
 	const matrix = [];
@@ -57,104 +61,93 @@ function createMatrix(w, h){
 // twin sided combo J/L
 // Others?
 
-// TODO: Add upcoming piece area
-
 function createPiece(type){
-
-	if (type === 'I'){
-		return [
+	const pieces = {
+		'I': [
 			[0, 1, 0, 0],
 			[0, 1, 0, 0],
 			[0, 1, 0, 0],
 			[0, 1, 0, 0],
-		]
-	}
-
-	if (type === 'J'){
-		return [
+		],
+		'J': [
 			[0, 2, 0],
 			[0, 2, 0],
 			[2, 2, 0],
-		]
-	}
-
-	if (type === 'L'){
-		return [
+		],
+		'L': [
 			[0, 3, 0],
 			[0, 3, 0],
 			[0, 3, 3],
-		]
-	}
-
-	if (type === 'O'){
-		return [
+		],
+		'O': [
  			[4, 4],
 			[4, 4],
-		]
-	}
-
-	if (type === 'S'){
-		return [
+		],
+		'S': [
 			[0, 5, 5],
 			[5, 5, 0],
 			[0, 0, 0],
-		]
-	}
-
-	if (type === 'T'){
-		return [
+		],
+		'T': [
 			[0, 0, 0],
 			[0, 6, 0],
 			[6, 6, 6],
-		]
-	}
-
-	if (type === 'Z'){
-		return [
+		],
+		'Z': [
 			[7, 7, 0],
 			[0, 7, 7],
 			[0, 0, 0],
 		]
+	};
+	return pieces[type];
+}
+
+// Draw functionality
+function clearCanvas(context, canvas) {
+	context.fillStyle = '#000';
+	context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawBlock(x, y, value, context, color = colors[value]){
+	if (value !== 0){
+		context.fillStyle = color;
+		context.fillRect(x, y, 1, 1);
 	}
 }
 
-function draw(){
-	// clear canvas before drawing
-	context.fillStyle = '#000';
-	context.fillRect(
-		0,
-		0,
-		canvas.width,
-		canvas.height
-	);
-
-	drawMatrix(
-		arena,
-		{
-			x: 0,
-			y: 0
-		}
-	);
-
-	drawMatrix(
-		player.matrix,
-		player.pos
-	);
-}
-
-function drawMatrix(matrix, offset){
+function drawMatrix(matrix, offset, context, color, isGhost = false){
 	matrix.forEach((row, y) => {
 		row.forEach((value, x) => {
-			if (value !== 0){
-				context.fillStyle = colors[value];
-				context.fillRect(
-					x + offset.x,
-					y + offset.y,
-					1,
-					1);
+			drawBlock(x + offset.x, y + offset.y, value, context, color);
+			if (value !== 0) {
+				drawBlock(x + offset.x, y + offset.y, value, context, color);
+				context.strokeStyle = isGhost ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)';;
+				context.lineWidth = 0.05;
+				context.strokeRect(x + offset.x, y + offset.y, 1, 1);
 			}
 		});
 	});
+}
+
+function getGhostPosition() {
+	const ghost = JSON.parse(JSON.stringify(player)); // deep copy player
+	while (!isColliding(arena, ghost)) {
+		ghost.pos.y++;
+	}
+	ghost.pos.y--;
+	return ghost.pos;
+}
+
+function draw(){
+	clearCanvas(context, canvas);
+
+	drawMatrix(arena, {x: 0, y: 0}, context);
+	// Draw ghost piece
+	const ghostPos = getGhostPosition();
+	drawMatrix(player.matrix, ghostPos, context, 'rgba(127, 127, 127, 0.5)', true);
+	
+	// Draw current piece
+	drawMatrix(player.matrix, player.pos, context);
 }
 
 function merge(arena, player){
@@ -167,57 +160,102 @@ function merge(arena, player){
 	});
 }
 
+// collision detection
+function collide(arena, player) {
+	const [playerMatrix, playerPos] = [player.matrix, player.pos];
+
+	for (let rowIndex = 0; rowIndex < playerMatrix.length; ++rowIndex) {
+		for (let columnIndex = 0; columnIndex < playerMatrix[rowIndex].length; ++columnIndex) {
+			if (playerMatrix[rowIndex][columnIndex] !== 0) {
+				if (
+					!arena[rowIndex + playerPos.y] ||
+					arena[rowIndex + playerPos.y][columnIndex + playerPos.x] !== 0
+				) {
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+function isColliding(arena, player) {
+	return collide(arena, player);
+}
+
+// Player functionality
 function playerMove(dir){
 	player.pos.x += dir;
-	if (collide(arena, player)){
+	if (isColliding(arena, player)){
 		player.pos.x -= dir;
 	}
 }
 
-function playerReset(){
+// TODO: Implement a queue system otherwise the next piece wont match
+function getRandomPiece() {
 	const pieces = 'IJLOSTZ';
-	player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
-	player.pos.y = 0;
-	player.pos.x = (arena[0].length / 2 | 0) -
-		(player.matrix[0].length / 2 | 0);
+	return createPiece(pieces[pieces.length * Math.random() | 0]);
+}
 
-	if (collide(arena, player)){
-		arena.forEach(row => row.fill(0));
-		// Reset scores and rows on collision
-		player.score = 0;
-		updateScore();
-		player.rows = 0;
-		updateRows();
+function playerReset(){
+	player.matrix = player.nextPiece || getRandomPiece();
+	player.nextPiece = getRandomPiece();
+	player.pos.y = 0;
+	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+
+	if (isColliding(arena, player)){
+		player.isPaused = true;
+		player.gameOver = true;
+	}
+
+	if (player.gameOver) {
+		const gameOverScreen = getId('game-over-screen');
+		const restartButton = getId('restart-game-button');
+		const finalScore = getId('final-score');
+
+		finalScore.textContent = 'Final Score: ' + player.score;
+		gameOverScreen.style.display = 'flex'; // Show the game over screen
+
+		restartButton.addEventListener('click', () => {
+			gameOverScreen.style.display = 'none'; // Hide the game over screen
+			player.isPaused = false;
+			player.gameOver = false;
+			player.score = 0;
+			player.rows = 0;
+			arena.forEach(row => row.fill(0)); 
+			playerReset();
+			updateScore();
+			updateRows();
+		});
 	}
 }
 
-function playerRotate(dir){
-	const pos = player.pos.x;
-	let offset = 1;
-	rotate(player.matrix, dir);
+function drawNextPiece() {
+	clearCanvas(previewContext, getId('preview'));
 
-	while (collide(arena, player)){
-		player.pos.x += offset;
-		offset = -(offset + (offset > 0 ? 1 : -1));
+	const scale = 20;
+	const x = getId('preview').width / 2 / scale - player.nextPiece[0].length / 2;
+	const y = getId('preview').height / 2 / scale - player.nextPiece.length / 2;
 
-		if (offset > player.matrix[0].length){
-			rotate(player.matrix, -dir);
-			player.pos.x = pos;
-			return;
-		}
-	}
+	drawMatrix(player.nextPiece, { x, y }, previewContext, undefined, false);
+}
+
+function updatePieces() {
+	player.matrix = player.nextPiece || getRandomPiece();
+	player.nextPiece = getRandomPiece();
+	player.pos.y = 0;
+	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+}
+
+function swap(matrix, x, y) {
+	[matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
 }
 
 function rotate(matrix, dir){
 	for (let y = 0; y < matrix.length; ++y){
 		for (let x = 0; x < y; ++x){
-			[
-				matrix[x][y],
-				matrix[y][x],
-			] = [
-				matrix[y][x],
-				matrix[x][y],
-			];
+			swap(matrix, x, y);
 		}
 	}
 
@@ -228,12 +266,34 @@ function rotate(matrix, dir){
 	}
 }
 
+function isOutOfBounds(offset, matrix) {
+	return offset > matrix[0].length;
+}
+
+function playerRotate(dir){
+	const pos = player.pos.x;
+	let offset = 1;
+	rotate(player.matrix, dir);
+
+	while (isColliding(arena, player)){
+		player.pos.x += offset;
+		offset = -(offset + (offset > 0 ? 1 : -1));
+
+		if (isOutOfBounds(offset, player.matrix)){
+			rotate(player.matrix, -dir);
+			player.pos.x = pos;
+			return;
+		}
+	}
+}
+
 function playerDrop(){
 	player.pos.y++;
 	if (collide(arena, player)){
 		player.pos.y--;
 		merge(arena, player);
 		playerReset();
+		updatePieces();
 		cleanArena();
 		updateScore();
 		updateRows();
@@ -241,21 +301,39 @@ function playerDrop(){
 	dropCounter = 0;
 }
 
+const instantDrop = () => {
+	while (!collide(arena, player)) {
+		player.pos.y++;
+	}
+	player.pos.y--;
+	merge(arena, player);
+	playerReset();
+	updatePieces();
+	cleanArena();
+	updateScore();
+	updateRows();
+};
+
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
 
+function togglePause() {
+	player.isPaused = !player.isPaused;
+}
+
 function update(time = 0){
 	const deltaTime = time - lastTime;
+	lastTime = time;
 
 	dropCounter += deltaTime;
 
-	if (dropCounter > dropInterval){
+	if (dropCounter > dropInterval && !player.isPaused){
 		playerDrop();
 	}
 
-	lastTime = time;
 	draw();
+	drawNextPiece();
 	requestAnimationFrame(update);
 }
 
@@ -269,16 +347,6 @@ function updateRows(){
 
 const arena = createMatrix(12, 20);
 
-const player = {
-	pos: {
-		x: 5,
-		y: 5
-	},
-	matrix: null,
-	rows: 0,
-	score: 0,
-}
-
 // TODO: Choose better colors
 const colors = [
 	null,
@@ -289,38 +357,26 @@ const colors = [
 	'green',
 	'purple',
 	'red'
-]
+];
+
+const keyActions = {
+	'ArrowLeft': () => playerMove(-1),
+	'ArrowUp': () => playerRotate(1),
+	'ArrowRight': () => playerMove(1),
+	'ArrowDown': () => playerDrop(),
+	'p': () => togglePause(),
+	'q': () => playerRotate(-1),
+	'w': () => playerRotate(1),
+	' ': () => instantDrop()
+};
 
 document.addEventListener('keydown', event => {
-	// left arrow
-	if (event.keyCode === 37){
-		event.preventDefault();
-		playerMove(-1);
-	}
-	// up arrow - rotate
-	if (event.keyCode === 38){
-		event.preventDefault();
-		playerRotate(1);
-	}
-	// right arrow
-	if (event.keyCode === 39){
-		event.preventDefault();
-		playerMove(1);
-	}
-	// down arrow - drop
-	if (event.keyCode === 40){
-		event.preventDefault();
-		playerDrop();
-	}
-	// 'Q' - rotate
-	if (event.keyCode === 81){
-		event.preventDefault();
-		playerRotate(-1);
-	}
-	// 'W' - rotate
-	if (event.keyCode === 87){
-		event.preventDefault();
-		playerRotate(1);
+	if (!player.isPaused || event.key === 'p') {
+		const keyAction = keyActions[event.key];
+		if (keyAction) {
+			event.preventDefault();
+			keyAction(event);
+		}
 	}
 });
 
@@ -328,8 +384,25 @@ playerReset();
 updateScore();
 updateRows();
 
-let startButton = getId('start-game-button');
+const startButton = getId('start-game-button');
+const startScreen = getId('start-screen');
 
-startButton.addEventListener('click', event => {
+startScreen.style.display = 'flex';
+
+startButton.addEventListener('click', () => {
+	startScreen.style.display = 'none';
+	player.isPaused = false;
+	player.gameOver = false;
 	update();
+});
+
+const continueButton = getId('continue-game-button');
+continueButton.addEventListener('click', () => {
+	player.isPaused = false;
+	update();
+});
+
+const pauseButton = getId('pause-button');
+pauseButton.addEventListener('click', () => {
+	togglePause();
 });

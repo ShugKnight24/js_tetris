@@ -8,24 +8,38 @@
 	</head>
 	<body>
 		<div id="container">
+			<div id="start-screen" class="screen">
+				<h1>Welcome to the Game</h1>
+				<button id="start-game-button">Start Game</button>
+			</div>
+			<div id="game-over-screen" class="screen">
+				<h1>Game Over</h1>
+				<p id="final-score"></p>
+				<button id="restart-game-button">Play Again</button>
+			</div>
 			<div id="counters">
-				<div id="score">
-
-				</div>
-				<div id="rows">
-
-				</div>
+				<canvas id="preview" width="200" height="200"></canvas>
+				<div id="score"></div>
+				<div id="rows"></div>
 				<div id="start">
-					<a id="start-game-button">Start Game</a>
+					<a id="continue-game-button">Continue Game</a>
+				</div>
+				<div id="pause">
+					<a id="pause-button">Pause Game</a>
 				</div>
 			</div>
 			<div id="game-container">
 				<canvas id="tetris-field" width="240" height="400"></canvas>
 			</div>
+			<!-- Make this dismissable -->
 			<div id="directions">
 				<h1>Tetris</h1>
 				<p>Use the left and right arrow keys to move the pieces</p>
+				<p>Use the down arrow key to drop the pieces</p>
+				<p>Drop the pieces instantly with the spacebar</p>
 				<p>Rotate the pieces using the 'Q', 'W', or the up arrow keys</p>
+				<p>Pause / unpause with 'P' or the pause button</p>
+				<p>Gain more points the more rows you take in a single move</p>
 				<p>Reach out with any suggestions / improvements</p>
 				<p>Have fun!</p>
 			</div>
