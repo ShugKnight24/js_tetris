@@ -258,6 +258,19 @@ function playerDrop(){
 	dropCounter = 0;
 }
 
+const instantDrop = () => {
+	while (!collide(arena, player)) {
+		player.pos.y++;
+	}
+	player.pos.y--;
+	merge(arena, player);
+	playerReset();
+	updatePieces();
+	cleanArena();
+	updateScore();
+	updateRows();
+};
+
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
@@ -301,7 +314,7 @@ const colors = [
 	'green',
 	'purple',
 	'red'
-]
+];
 
 const keyActions = {
 	'ArrowLeft': () => playerMove(-1),
@@ -310,7 +323,8 @@ const keyActions = {
 	'ArrowDown': () => playerDrop(),
 	'p': () => togglePause(),
 	'q': () => playerRotate(-1),
-	'w': () => playerRotate(1)
+	'w': () => playerRotate(1),
+	' ': () => instantDrop()
 };
 
 document.addEventListener('keydown', event => {
