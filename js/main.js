@@ -8,7 +8,8 @@ const player = {
 	matrix: null,
 	rows: 0,
 	score: 0,
-	nextPiece: null
+	nextPiece: null,
+	isPaused: false
 };
 
 function getId(element){
@@ -272,8 +273,8 @@ function playerDrop(){
 	if (collide(arena, player)){
 		player.pos.y--;
 		merge(arena, player);
-		updatePieces();
 		playerReset();
+		updatePieces();
 		cleanArena();
 		updateScore();
 		updateRows();
@@ -285,19 +286,23 @@ let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
 
+function togglePause() {
+	player.isPaused = !player.isPaused;
+}
+
 function update(time = 0){
 	const deltaTime = time - lastTime;
+	lastTime = time;
 
 	dropCounter += deltaTime;
 
-	if (dropCounter > dropInterval){
+	if (dropCounter > dropInterval && !player.isPaused){
 		playerDrop();
 	}
 
-	lastTime = time;
 	draw();
-	requestAnimationFrame(update);
 	drawNextPiece();
+	requestAnimationFrame(update);
 }
 
 function updateScore(){
@@ -323,33 +328,37 @@ const colors = [
 ]
 
 document.addEventListener('keydown', event => {
-	// left arrow
-	if (event.key === 'ArrowLeft'){
+	// Move piece left
+	if (event.key === 'ArrowLeft' && !player.isPaused){
 		event.preventDefault();
 		playerMove(-1);
 	}
-	// up arrow - rotate
-	if (event.key === 'ArrowUp'){
+	// Rotate piece
+	if (event.key === 'ArrowUp' && !player.isPaused){
 		event.preventDefault();
 		playerRotate(1);
 	}
-	// right arrow
-	if (event.key === 'ArrowRight'){
+	// Move piece right
+	if (event.key === 'ArrowRight' && !player.isPaused){
 		event.preventDefault();
 		playerMove(1);
 	}
-	// down arrow - drop
-	if (event.key === 'ArrowDown'){
+	// Drop piece
+	if (event.key === 'ArrowDown' && !player.isPaused){
 		event.preventDefault();
 		playerDrop();
 	}
+	// 'P' - pause
+	if (event.key === 'p') {
+		togglePause();
+	}
 	// 'Q' - rotate
-	if (event.key === 'q'){
+	if (event.key === 'q' && !player.isPaused){
 		event.preventDefault();
 		playerRotate(-1);
 	}
 	// 'W' - rotate
-	if (event.key === 'w'){
+	if (event.key === 'w' && !player.isPaused){
 		event.preventDefault();
 		playerRotate(1);
 	}
