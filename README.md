@@ -22,6 +22,7 @@ Tetris built with JavaScript and HTML5 canvas
 - [ ] Add a more 'complex' version with additional pieces
 
 ## Improvements
+- [X] Preview piece works properly
 - [X] Update scoring based off of total rows cleared in a single move
 - [X] Add a start game screen & game over screen
 - [X] Add a 'ghost' piece that shows where the current piece will land
@@ -30,12 +31,10 @@ Tetris built with JavaScript and HTML5 canvas
 - [X] Add preview for upcoming pieces - Currently bugged
 
 ## Bugs
-- Preview piece is not correct - currently randomly generating...
-  - Create a queue system
 
 ## Resolved Bugs
+- [X] ~~Preview piece is not working properly~~
 - [X] ~~Rows counter is not updating~~
-  - Rows counter is now updating properly
 
 ## Suggestions
 Feel free to reach out, create an issue, or make a pull request for any features and improvements you'd like to see in the game.
