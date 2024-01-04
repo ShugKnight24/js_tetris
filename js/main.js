@@ -205,6 +205,28 @@ function updatePieces() {
 	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
 }
 
+function swap(matrix, x, y) {
+	[matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+}
+
+function rotate(matrix, dir){
+	for (let y = 0; y < matrix.length; ++y){
+		for (let x = 0; x < y; ++x){
+			swap(matrix, x, y);
+		}
+	}
+
+	if (dir > 0){
+		matrix.forEach(row => row.reverse());
+	} else {
+		matrix.reverse();
+	}
+}
+
+function isOutOfBounds(offset, matrix) {
+	return offset > matrix[0].length;
+}
+
 function playerRotate(dir){
 	const pos = player.pos.x;
 	let offset = 1;
@@ -214,31 +236,11 @@ function playerRotate(dir){
 		player.pos.x += offset;
 		offset = -(offset + (offset > 0 ? 1 : -1));
 
-		if (offset > player.matrix[0].length){
+		if (isOutOfBounds(offset, player.matrix)){
 			rotate(player.matrix, -dir);
 			player.pos.x = pos;
 			return;
 		}
-	}
-}
-
-function rotate(matrix, dir){
-	for (let y = 0; y < matrix.length; ++y){
-		for (let x = 0; x < y; ++x){
-			[
-				matrix[x][y],
-				matrix[y][x],
-			] = [
-				matrix[y][x],
-				matrix[x][y],
-			];
-		}
-	}
-
-	if (dir > 0){
-		matrix.forEach(row => row.reverse());
-	} else {
-		matrix.reverse();
 	}
 }
 
