@@ -72,8 +72,6 @@ function createMatrix(w, h){
 // twin sided combo J/L
 // Others?
 
-// TODO: Add upcoming piece area
-
 function createPiece(type){
 
 	if (type === 'I'){
@@ -132,6 +130,8 @@ function createPiece(type){
 		]
 	}
 
+	// TODO: This is causing the preview piece to be random
+	// create a queue of pieces to be used instead
 	player.nextPiece = pieces[pieces.length * Math.random() | 0];
 }
 
@@ -368,8 +368,12 @@ playerReset();
 updateScore();
 updateRows();
 
-let startButton = getId('start-game-button');
-
+const startButton = getId('start-game-button');
 startButton.addEventListener('click', event => {
 	update();
+});
+
+const pauseButton = getId('pause-button');
+pauseButton.addEventListener('click', event => {
+	togglePause();
 });

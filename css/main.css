@@ -37,16 +37,18 @@ body {
 }
 
 #start {
-	margin-top: 20px;
+	margin: 20px 0 45px;
 }
 
-#start-game-button {
+#start-game-button,
+#pause-button {
 	padding: 10px;
 	border: 2px solid #FFF;
 	border-radius: 4px;
 }
 
-#start-game-button:hover {
+#start-game-button:hover,
+#pause-button:hover {
 	cursor: pointer;
 	color: #000;
 	background-color: #FFF;
