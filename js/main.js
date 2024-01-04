@@ -303,40 +303,23 @@ const colors = [
 	'red'
 ]
 
+const keyActions = {
+	'ArrowLeft': () => playerMove(-1),
+	'ArrowUp': () => playerRotate(1),
+	'ArrowRight': () => playerMove(1),
+	'ArrowDown': () => playerDrop(),
+	'p': () => togglePause(),
+	'q': () => playerRotate(-1),
+	'w': () => playerRotate(1)
+};
+
 document.addEventListener('keydown', event => {
-	// Move piece left
-	if (event.key === 'ArrowLeft' && !player.isPaused){
-		event.preventDefault();
-		playerMove(-1);
-	}
-	// Rotate piece
-	if (event.key === 'ArrowUp' && !player.isPaused){
-		event.preventDefault();
-		playerRotate(1);
-	}
-	// Move piece right
-	if (event.key === 'ArrowRight' && !player.isPaused){
-		event.preventDefault();
-		playerMove(1);
-	}
-	// Drop piece
-	if (event.key === 'ArrowDown' && !player.isPaused){
-		event.preventDefault();
-		playerDrop();
-	}
-	// 'P' - pause
-	if (event.key === 'p') {
-		togglePause();
-	}
-	// 'Q' - rotate
-	if (event.key === 'q' && !player.isPaused){
-		event.preventDefault();
-		playerRotate(-1);
-	}
-	// 'W' - rotate
-	if (event.key === 'w' && !player.isPaused){
-		event.preventDefault();
-		playerRotate(1);
+	if (!player.isPaused || event.key === 'p') {
+		const keyAction = keyActions[event.key];
+		if (keyAction) {
+			event.preventDefault();
+			keyAction(event);
+		}
 	}
 });
 
