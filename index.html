@@ -8,12 +8,21 @@
 	</head>
 	<body>
 		<div id="container">
+			<div id="start-screen" class="screen">
+				<h1>Welcome to the Game</h1>
+				<button id="start-game-button">Start Game</button>
+			</div>
+			<div id="game-over-screen" class="screen">
+				<h1>Game Over</h1>
+				<p id="final-score"></p>
+				<button id="restart-game-button">Play Again</button>
+			</div>
 			<div id="counters">
 				<canvas id="preview" width="200" height="200"></canvas>
 				<div id="score"></div>
 				<div id="rows"></div>
 				<div id="start">
-					<a id="start-game-button">Start Game</a>
+					<a id="continue-game-button">Continue Game</a>
 				</div>
 				<div id="pause">
 					<a id="pause-button">Pause Game</a>

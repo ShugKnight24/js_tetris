@@ -9,7 +9,8 @@ const player = {
 	rows: 0,
 	score: 0,
 	nextPiece: null,
-	isPaused: false
+	isPaused: false,
+	gameOver: false
 };
 
 function getId(element){
@@ -201,13 +202,29 @@ function playerReset(){
 	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
 
 	if (isColliding(arena, player)){
-		arena.forEach(row => row.fill(0));
-		// Reset scores and rows on collision
-		player.score = 0;
-		updateScore();
-		player.rows = 0;
-		updateRows();
 		player.isPaused = true;
+		player.gameOver = true;
+	}
+
+	if (player.gameOver) {
+		const gameOverScreen = getId('game-over-screen');
+		const restartButton = getId('restart-game-button');
+		const finalScore = getId('final-score');
+
+		finalScore.textContent = 'Final Score: ' + player.score;
+		gameOverScreen.style.display = 'flex'; // Show the game over screen
+
+		restartButton.addEventListener('click', () => {
+			gameOverScreen.style.display = 'none'; // Hide the game over screen
+			player.isPaused = false;
+			player.gameOver = false;
+			player.score = 0;
+			player.rows = 0;
+			arena.forEach(row => row.fill(0)); 
+			playerReset();
+			updateScore();
+			updateRows();
+		});
 	}
 }
 
@@ -365,14 +382,24 @@ updateScore();
 updateRows();
 
 const startButton = getId('start-game-button');
-startButton.addEventListener('click', event => {
-	// TODO: Implement a start screen
-	// Should the default functionality be if the start button is clicked the game restarts?
+const startScreen = getId('start-screen');
+
+startScreen.style.display = 'flex';
+
+startButton.addEventListener('click', () => {
+	startScreen.style.display = 'none';
+	player.isPaused = false;
+	player.gameOver = false;
+	update();
+});
+
+const continueButton = getId('continue-game-button');
+continueButton.addEventListener('click', () => {
 	player.isPaused = false;
 	update();
 });
 
 const pauseButton = getId('pause-button');
-pauseButton.addEventListener('click', event => {
+pauseButton.addEventListener('click', () => {
 	togglePause();
 });
