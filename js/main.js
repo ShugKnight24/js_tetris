@@ -18,11 +18,10 @@ function getId(element){
 
 const canvas = getId('tetris-field');
 const context = canvas.getContext('2d');
+context.scale(20, 20);
 
 const previewContext = getId('preview').getContext('2d');
 previewContext.scale(20, 20);
-
-context.scale(20, 20);
 
 function cleanArena(){
 	let rowCount = 1;
@@ -215,7 +214,11 @@ function playerReset(){
 function drawNextPiece() {
 	clearCanvas(previewContext, getId('preview'));
 
-	drawMatrix(player.nextPiece, {x: 0, y: 0}, previewContext);
+	const scale = 20;
+	const x = getId('preview').width / 2 / scale - player.nextPiece[0].length / 2;
+	const y = getId('preview').height / 2 / scale - player.nextPiece.length / 2;
+
+	drawMatrix(player.nextPiece, { x, y }, previewContext, undefined, false);
 }
 
 function updatePieces() {
