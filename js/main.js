@@ -112,17 +112,23 @@ function drawBlock(x, y, value, context, color = colors[value]){
 	}
 }
 
-function drawMatrix(matrix, offset, context, color){
+function drawMatrix(matrix, offset, context, color, isGhost = false){
 	matrix.forEach((row, y) => {
 		row.forEach((value, x) => {
 			drawBlock(x + offset.x, y + offset.y, value, context, color);
+			if (value !== 0) {
+				drawBlock(x + offset.x, y + offset.y, value, context, color);
+				context.strokeStyle = isGhost ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)';;
+				context.lineWidth = 0.05;
+				context.strokeRect(x + offset.x, y + offset.y, 1, 1);
+			}
 		});
 	});
 }
 
 function getGhostPosition() {
 	const ghost = JSON.parse(JSON.stringify(player)); // deep copy player
-	while (!collide(arena, ghost)) {
+	while (!isColliding(arena, ghost)) {
 		ghost.pos.y++;
 	}
 	ghost.pos.y--;
@@ -138,7 +144,7 @@ function draw(){
 
 	// Draw ghost piece
 	const ghostPos = getGhostPosition();
-	drawMatrix(player.matrix, ghostPos, context, 'rgba(127, 127, 127, 0.5)');
+	drawMatrix(player.matrix, ghostPos, context, 'rgba(127, 127, 127, 0.5)', true);
 }
 
 function merge(arena, player){
