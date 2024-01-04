@@ -45,20 +45,6 @@ function cleanArena(){
 	}
 }
 
-function collide(arena, player){
-	const [m, o] = [player.matrix, player.pos];
-	for (let y = 0; y < m.length; ++y){
-		for (let x = 0; x < m[y].length; ++x){
-			if (m[y][x] !== 0 &&
-				(arena[y + o.y] &&
-				arena[y + o.y][x + o.x]) !== 0){
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
 function createMatrix(w, h){
 	const matrix = [];
 	while (h--){
@@ -151,30 +137,58 @@ function merge(arena, player){
 	});
 }
 
+// collision detection
+function collide(arena, player) {
+	const [playerMatrix, playerPos] = [player.matrix, player.pos];
+
+	for (let rowIndex = 0; rowIndex < playerMatrix.length; ++rowIndex) {
+		for (let columnIndex = 0; columnIndex < playerMatrix[rowIndex].length; ++columnIndex) {
+			if (playerMatrix[rowIndex][columnIndex] !== 0) {
+				if (
+					!arena[rowIndex + playerPos.y] ||
+					arena[rowIndex + playerPos.y][columnIndex + playerPos.x] !== 0
+				) {
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+function isColliding(arena, player) {
+	return collide(arena, player);
+}
+
+// Player functionality
 function playerMove(dir){
 	player.pos.x += dir;
-	if (collide(arena, player)){
+	if (isColliding(arena, player)){
 		player.pos.x -= dir;
 	}
 }
 
-function playerReset(){
+// TODO: Implement a queue system otherwise the next piece wont match
+function getRandomPiece() {
 	const pieces = 'IJLOSTZ';
-	if (!player.nextPiece) {
-		player.nextPiece = createPiece(pieces[pieces.length * Math.random() | 0]);
-	}
-	player.matrix = player.nextPiece;
-	player.nextPiece = createPiece(pieces[pieces.length * Math.random() | 0]);
+	return createPiece(pieces[pieces.length * Math.random() | 0]);
+}
+
+function playerReset(){
+	player.matrix = player.nextPiece || getRandomPiece();
+	player.nextPiece = getRandomPiece();
 	player.pos.y = 0;
 	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
 
-	if (collide(arena, player)){
+	if (isColliding(arena, player)){
 		arena.forEach(row => row.fill(0));
 		// Reset scores and rows on collision
 		player.score = 0;
 		updateScore();
 		player.rows = 0;
 		updateRows();
+		player.isPaused = true;
 	}
 }
 
@@ -185,12 +199,8 @@ function drawNextPiece() {
 }
 
 function updatePieces() {
-	const pieces = 'IJLOSTZ';
-	if (!player.nextPiece) {
-			player.nextPiece = createPiece(pieces[pieces.length * Math.random() | 0]);
-	}
-	player.matrix = player.nextPiece;
-	player.nextPiece = createPiece(pieces[pieces.length * Math.random() | 0]);
+	player.matrix = player.nextPiece || getRandomPiece();
+	player.nextPiece = getRandomPiece();
 	player.pos.y = 0;
 	player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
 }
@@ -200,7 +210,7 @@ function playerRotate(dir){
 	let offset = 1;
 	rotate(player.matrix, dir);
 
-	while (collide(arena, player)){
+	while (isColliding(arena, player)){
 		player.pos.x += offset;
 		offset = -(offset + (offset > 0 ? 1 : -1));
 
@@ -334,6 +344,9 @@ updateRows();
 
 const startButton = getId('start-game-button');
 startButton.addEventListener('click', event => {
+	// TODO: Implement a start screen
+	// Should the default functionality be if the start button is clicked the game restarts?
+	player.isPaused = false;
 	update();
 });
 
