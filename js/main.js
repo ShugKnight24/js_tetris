@@ -73,66 +73,44 @@ function createMatrix(w, h){
 // Others?
 
 function createPiece(type){
-
-	if (type === 'I'){
-		return [
+	const pieces = {
+		'I': [
 			[0, 1, 0, 0],
 			[0, 1, 0, 0],
 			[0, 1, 0, 0],
 			[0, 1, 0, 0],
-		]
-	}
-
-	if (type === 'J'){
-		return [
+		],
+		'J': [
 			[0, 2, 0],
 			[0, 2, 0],
 			[2, 2, 0],
-		]
-	}
-
-	if (type === 'L'){
-		return [
+		],
+		'L': [
 			[0, 3, 0],
 			[0, 3, 0],
 			[0, 3, 3],
-		]
-	}
-
-	if (type === 'O'){
-		return [
+		],
+		'O': [
  			[4, 4],
 			[4, 4],
-		]
-	}
-
-	if (type === 'S'){
-		return [
+		],
+		'S': [
 			[0, 5, 5],
 			[5, 5, 0],
 			[0, 0, 0],
-		]
-	}
-
-	if (type === 'T'){
-		return [
+		],
+		'T': [
 			[0, 0, 0],
 			[0, 6, 0],
 			[6, 6, 6],
-		]
-	}
-
-	if (type === 'Z'){
-		return [
+		],
+		'Z': [
 			[7, 7, 0],
 			[0, 7, 7],
 			[0, 0, 0],
 		]
-	}
-
-	// TODO: This is causing the preview piece to be random
-	// create a queue of pieces to be used instead
-	player.nextPiece = pieces[pieces.length * Math.random() | 0];
+	};
+	return pieces[type];
 }
 
 function draw(){
