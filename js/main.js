@@ -139,12 +139,12 @@ function draw(){
 	clearCanvas(context, canvas);
 
 	drawMatrix(arena, {x: 0, y: 0}, context);
-	// Draw current piece
-	drawMatrix(player.matrix, player.pos, context);
-
 	// Draw ghost piece
 	const ghostPos = getGhostPosition();
 	drawMatrix(player.matrix, ghostPos, context, 'rgba(127, 127, 127, 0.5)', true);
+	
+	// Draw current piece
+	drawMatrix(player.matrix, player.pos, context);
 }
 
 function merge(arena, player){
