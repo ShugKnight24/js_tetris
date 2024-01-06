@@ -35,6 +35,10 @@ body {
 	font-size: 2rem;
 }
 
+#pause-screen:hover {
+	cursor: pointer;
+}
+
 #counters,
 #directions,
 #game-container {
@@ -51,11 +55,10 @@ body {
 	font-size: 2rem;
 }
 
-#start {
-	margin: 20px 0 45px;
+#pause {
+	margin: 20px 0;
 }
 
-#continue-game-button,
 #restart-game-button,
 #start-game-button,
 #pause-button {
@@ -64,7 +67,6 @@ body {
 	border-radius: 4px;
 }
 
-#continue-game-button:hover,
 #restart-game-button:hover,
 #start-game-button:hover,
 #pause-button:hover {

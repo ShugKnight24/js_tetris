@@ -316,8 +316,16 @@ let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
 
+
 function togglePause() {
 	player.isPaused = !player.isPaused;
+	
+	const pauseScreen = getId('pause-screen');
+	if (player.isPaused) {
+		pauseScreen.style.display = 'flex';
+	} else {
+		pauseScreen.style.display = 'none';
+	}
 }
 
 function update(time = 0){
@@ -394,13 +402,8 @@ startButton.addEventListener('click', () => {
 	update();
 });
 
-const continueButton = getId('continue-game-button');
-continueButton.addEventListener('click', () => {
-	player.isPaused = false;
-	update();
-});
-
-const pauseButton = getId('pause-button');
-pauseButton.addEventListener('click', () => {
-	togglePause();
+document.querySelectorAll(['#pause-button', '#pause-screen']).forEach(button => {
+	button.addEventListener('click', () => {
+		togglePause();
+	});
 });
