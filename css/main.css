@@ -40,6 +40,10 @@ body {
 	cursor: pointer;
 }
 
+#pause-screen h2 {
+	margin-bottom: 20px;
+}
+
 #counters,
 #directions,
 #game-container {
@@ -77,6 +81,10 @@ body {
 	color: #000;
 	background-color: #FFF;
 	border-color: #000;
+}
+
+#start-game-button {
+	margin-top: 20px;
 }
 
 #restart-game-button {
