@@ -33,6 +33,15 @@ body {
 	background-color: rgba(0, 0, 0, 0.90);
 	color: white;
 	font-size: 2rem;
+	z-index: 1;
+}
+
+#pause-screen:hover {
+	cursor: pointer;
+}
+
+#pause-screen h2 {
+	margin-bottom: 20px;
 }
 
 #counters,
@@ -51,27 +60,31 @@ body {
 	font-size: 2rem;
 }
 
-#start {
-	margin: 20px 0 45px;
+#pause {
+	margin: 20px 0;
 }
 
-#continue-game-button,
 #restart-game-button,
 #start-game-button,
-#pause-button {
+#pause-button,
+#show-directions-button {
 	padding: 10px;
 	border: 2px solid #FFF;
 	border-radius: 4px;
 }
 
-#continue-game-button:hover,
 #restart-game-button:hover,
 #start-game-button:hover,
-#pause-button:hover {
+#pause-button:hover,
+#show-directions-button:hover {
 	cursor: pointer;
 	color: #000;
 	background-color: #FFF;
 	border-color: #000;
+}
+
+#start-game-button {
+	margin-top: 20px;
 }
 
 #restart-game-button {
@@ -91,6 +104,14 @@ canvas {
 	height: 25vh;
 }
 
+#directions {
+	position: relative;
+}
+
+#directions.hidden {
+	display: none;
+}
+
 #directions h1 {
 	font-size: 2rem;
 }
@@ -98,4 +119,38 @@ canvas {
 #directions p {
 	font-size: 1.5rem;
 	margin-bottom: 10px;
+}
+
+#hide-directions-button {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: red;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	text-align: center;
+	line-height: 40px;
+	cursor: pointer;
+	font-size: 30px;
+	font-weight: bold;
+}
+
+#show-directions {
+	display: inline-block;
+	vertical-align: top;
+}
+
+#show-directions-button {
+	display: none;
+	width: 150px;
+	padding: 15px;
+	background-color: #000;
+	color: #FFF;
+	font-size: 16px;
 }

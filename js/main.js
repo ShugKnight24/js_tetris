@@ -316,8 +316,16 @@ let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
 
+
 function togglePause() {
 	player.isPaused = !player.isPaused;
+	
+	const pauseScreen = getId('pause-screen');
+	if (player.isPaused) {
+		pauseScreen.style.display = 'flex';
+	} else {
+		pauseScreen.style.display = 'none';
+	}
 }
 
 function update(time = 0){
@@ -394,13 +402,24 @@ startButton.addEventListener('click', () => {
 	update();
 });
 
-const continueButton = getId('continue-game-button');
-continueButton.addEventListener('click', () => {
-	player.isPaused = false;
-	update();
+document.querySelectorAll(['#pause-button', '#pause-screen']).forEach(button => {
+	button.addEventListener('click', () => {
+		togglePause();
+	});
 });
 
-const pauseButton = getId('pause-button');
-pauseButton.addEventListener('click', () => {
-	togglePause();
+const directions = getId('directions');
+const showDirectionsButton = getId('show-directions-button');
+const hideDirectionsButton = getId('hide-directions-button');
+
+getId('hide-directions-button').addEventListener('click', function() {
+	directions.classList.add('hidden');
+	showDirectionsButton.style.display = 'block';
+	hideDirectionsButton.style.display = 'none';
+});
+
+getId('show-directions-button').addEventListener('click', function() {
+	directions.classList.remove('hidden');
+	showDirectionsButton.style.display = 'none';
+	hideDirectionsButton.style.display = 'block';
 });
