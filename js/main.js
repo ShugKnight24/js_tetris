@@ -407,3 +407,19 @@ document.querySelectorAll(['#pause-button', '#pause-screen']).forEach(button => 
 		togglePause();
 	});
 });
+
+const directions = getId('directions');
+const showDirectionsButton = getId('show-directions-button');
+const hideDirectionsButton = getId('hide-directions-button');
+
+getId('hide-directions-button').addEventListener('click', function() {
+	directions.classList.add('hidden');
+	showDirectionsButton.style.display = 'block';
+	hideDirectionsButton.style.display = 'none';
+});
+
+getId('show-directions-button').addEventListener('click', function() {
+	directions.classList.remove('hidden');
+	showDirectionsButton.style.display = 'none';
+	hideDirectionsButton.style.display = 'block';
+});
